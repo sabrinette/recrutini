@@ -8,6 +8,10 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
 import com.google.android.material.textfield.TextInputEditText;
 
 public class LoginActivity extends AppCompatActivity {
@@ -26,6 +30,7 @@ public class LoginActivity extends AppCompatActivity {
         confirmLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
                 String emailText = email.getText().toString();
                 String passwordText = password.getText().toString();
 
