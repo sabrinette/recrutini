@@ -1,6 +1,7 @@
 package sabrine.chams.recrutini;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -32,6 +33,7 @@ import java.util.Queue;
 
 public class LoginActivity extends AppCompatActivity {
 
+    ConstraintLayout loginPage ;
     TextInputEditText email;
     TextInputEditText password;
     TextView goRegiter;
@@ -41,6 +43,7 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         email = findViewById(R.id.email);
+        loginPage = findViewById(R.id.login_page);
         password = findViewById(R.id.password);
         confirmLogin = findViewById(R.id.confirm_login);
         confirmLogin.setOnClickListener(new View.OnClickListener() {
@@ -80,17 +83,18 @@ public class LoginActivity extends AppCompatActivity {
                                         email.setText(null);
                                     }
                                     else {
-                                        email.setError("Erreur serveur !");
+                                        Snackbar.make(loginPage ," Login failed !" , Snackbar.LENGTH_LONG).show();
                                     }
                                 } catch (JSONException e) {
                                     e.printStackTrace();
+                                    Snackbar.make(loginPage ," parsing Json failed !" , Snackbar.LENGTH_LONG).show();
                                 }
                             }
                         },
                         new Response.ErrorListener() {
                             @Override
                             public void onErrorResponse(VolleyError error) {
-
+                                Snackbar.make(loginPage ," Login failed !" , Snackbar.LENGTH_LONG).show();
                             }
                         }) {
                     @Override
