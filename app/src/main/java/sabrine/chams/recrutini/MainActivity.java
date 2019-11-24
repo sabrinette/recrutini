@@ -42,9 +42,9 @@ public class MainActivity extends AppCompatActivity
         tabIndicator = findViewById(R.id.tab_indicator);
         btnAnim = AnimationUtils.loadAnimation(getApplicationContext(),R.anim.button_animation);
         final List<ScreenItem> mList = new ArrayList<>();
-        mList.add( new ScreenItem("fresh food1" ,"salut1" , R.drawable.img1));
-        mList.add( new ScreenItem("fresh food2" ,"salut2" , R.drawable.img2));
-        mList.add( new ScreenItem("fresh food3" ,"salut3" , R.drawable.img3));
+        mList.add( new ScreenItem("Are you looking for an internship?" ,"recrutini helps you to find one" , R.drawable.stage ));
+        mList.add( new ScreenItem("Are you looking you for a job?" ,"recrutini helps you to find one" , R.drawable.job));
+        mList.add( new ScreenItem("We're looking for you","Join us" , R.drawable.hiring));
         screenPager = findViewById(R.id.screen_viewpager);
         introViewPagerAdapter =  new IntroViewPagerAdapter(this,mList);
         screenPager.setAdapter(introViewPagerAdapter);

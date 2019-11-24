@@ -50,8 +50,8 @@ public class AjoutOffre extends AppCompatActivity {
         phoneNumber = findViewById(R.id.phone_number);
         description= findViewById(R.id.description);
         offerPage = findViewById(R.id.offer_page);
-        stage = findViewById(R.id.stage);
-        poste = findViewById(R.id.poste_emploi);
+        type = findViewById(R.id.type);
+        confirmAjout = findViewById(R.id.confirm_ajout);
         confirmAjout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -61,7 +61,9 @@ public class AjoutOffre extends AppCompatActivity {
                 final String descriptionText = description.getText().toString();
                 final String phoneNumberText = phoneNumber.getText().toString();
                 final String dateEmbaucheText = dateEmbauche.getText().toString();
-                StringRequest postRequest = new StringRequest(Request.Method.POST, "http://sabrine-chams.alwaysdata.net/insert_societe.php",
+                RadioButton  btn = (RadioButton) type.getChildAt(type.indexOfChild(findViewById(type.getCheckedRadioButtonId()))) ;
+                final String typeText = btn.getText().toString();
+                StringRequest postRequest = new StringRequest(Request.Method.POST, "http://sabrine-chams.alwaysdata.net/insert_offre.php",
                             new Response.Listener<String>() {
                                 @Override
                                 public void onResponse(String response) {
@@ -74,33 +76,31 @@ public class AjoutOffre extends AppCompatActivity {
                                             Intent loginActivity = new Intent( getApplicationContext(), LoginActivity.class);
                                             startActivity(loginActivity);
                                         }
-                                        else if (success.equals("2")){
-                                            Snackbar.make(registerPage ," This account already exists !" , Snackbar.LENGTH_LONG).show();
-                                        }
                                         else {
-                                            Snackbar.make(registerPage ," Registration failed !" , Snackbar.LENGTH_LONG).show();
+                                            Snackbar.make(offerPage ," Addition failed !" , Snackbar.LENGTH_LONG).show();
                                         }
 
                                     } catch (JSONException e) {
                                         e.printStackTrace();
-                                        Snackbar.make(registerPage ," parsing Json failed !" , Snackbar.LENGTH_LONG).show();
+                                        Snackbar.make(offerPage ," parsing Json failed !" , Snackbar.LENGTH_LONG).show();
                                     }
                                 }
                             },
                             new Response.ErrorListener() {
                                 @Override
                                 public void onErrorResponse(VolleyError error) {
-                                    Snackbar.make(registerPage ," Registration failed !" , Snackbar.LENGTH_LONG).show();
+                                    Snackbar.make(offerPage," Addition failed !" , Snackbar.LENGTH_LONG).show();
                                 }
                             }) {
                         @Override
                         protected Map<String, String> getParams() {
                             Map<String, String> params = new HashMap<String, String>();
                             params.put("email", emailText);
-                            params.put("password", passwordText);
-                            params.put("adresse", addressText);
-                            params.put("nom", nameText);
-                            params.put("num_tel", phomeNumberText);
+                            params.put("nom", offerText);
+                            params.put("description", descriptionText);
+                            params.put("debut_embauche", dateEmbaucheText);
+                            params.put("num_tel", phoneNumberText);
+                            params.put("type", typeText);
                             return params;
                         }
                     };
