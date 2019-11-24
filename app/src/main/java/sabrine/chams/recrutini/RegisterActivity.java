@@ -73,7 +73,7 @@ public class RegisterActivity extends AppCompatActivity {
                     final String emailText = email.getText().toString();
                     final String nameText = name.getText().toString();
                     final String addressText = address.getText().toString();
-                    final String phomeNumberText = phoneNumber.getText().toString();
+                    final String phoneNumberText = phoneNumber.getText().toString();
                     final String confirmPasswordText = new BigInteger(1, md.digest(confirmPassword.getText().toString().getBytes())).toString(16);
                     final String passwordText = new BigInteger(1, md.digest(password.getText().toString().getBytes())).toString(16);
                     StringRequest postRequest = new StringRequest(Request.Method.POST, "http://sabrine-chams.alwaysdata.net/insert_societe.php",
@@ -115,7 +115,7 @@ public class RegisterActivity extends AppCompatActivity {
                             params.put("password", passwordText);
                             params.put("adresse", addressText);
                             params.put("nom", nameText);
-                            params.put("num_tel", phomeNumberText);
+                            params.put("num_tel", phoneNumberText);
                             return params;
                         }
                     };
