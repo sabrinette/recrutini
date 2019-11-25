@@ -57,11 +57,13 @@ public class HomeActivity extends AppCompatActivity {
                             ListViewAdapter listViewAdapter = new ListViewAdapter(thisActivity,offerNames,offerDescriptions,offerImgsUrls);
                             lst.setAdapter(listViewAdapter);
                         }
+                        //todo add "no offers" text view to the list view in case of no data returned
                     }
                 },
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
+                        //todo add "connection problems" text view to the list view
                         Snackbar.make(homePage, "Cannot get Offers from server", Snackbar.LENGTH_LONG).show();
                     }
                 });
