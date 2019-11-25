@@ -5,6 +5,7 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.ListView;
 
 import com.android.volley.Request;
@@ -40,31 +41,35 @@ public class HomeActivity extends AppCompatActivity {
         final Activity thisActivity = this;
 
         RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
-        JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.GET, "http://sabrine-chams.alwaysdata.net/get_offre.php", null,
-                new Response.Listener<JSONObject>() {
+        StringRequest jsonRequest = new StringRequest(Request.Method.GET, "https://sabrine-chams.alwaysdata.net/get_offre.php",
+                new Response.Listener<String>() {
                     @Override
-                    public void onResponse(JSONObject response) {
-                        int i = 0;
-                        for (Iterator it = response.keys(); it.hasNext();)
-                        {
-                            try {
-                                offerNames[i] = response.optJSONObject((String)it.next()).getString("nom");
-                                offerDescriptions[i] = response.optJSONObject((String)it.next()).getString("description");
-                                offerImgsUrls[i] = response.optJSONObject((String)it.next()).getString("img_url");
-                            } catch (JSONException e) {
-                                e.printStackTrace();
+                    public void onResponse(String response) {
+                        JSONArray res = null;
+                        offerNames = new String[response.length()];
+                        offerDescriptions = new String[response.length()];
+                        offerImgsUrls = new String[response.length()];
+                        try {
+                            res = new JSONArray(response);
+                            for (int i = 0; i < res.length(); i++)
+                            {
+                                offerNames[i] = res.getJSONObject(i).getString("nom");
+                                offerDescriptions[i] = res.getJSONObject(i).optString("description");
+                                offerImgsUrls[i] = res.getJSONObject(i).optString("img_url");
                             }
                             ListViewAdapter listViewAdapter = new ListViewAdapter(thisActivity,offerNames,offerDescriptions,offerImgsUrls);
                             lst.setAdapter(listViewAdapter);
+                            //todo add "no offers" text view to the list view in case of no data returned
+                        } catch (JSONException e) {
+                            e.printStackTrace();
                         }
-                        //todo add "no offers" text view to the list view in case of no data returned
                     }
                 },
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         //todo add "connection problems" text view to the list view
-                        Snackbar.make(homePage, "Cannot get Offers from server", Snackbar.LENGTH_LONG).show();
+                        Snackbar.make(homePage, error.getMessage(), 15000).show();
                     }
                 });
         queue.add(jsonRequest);
