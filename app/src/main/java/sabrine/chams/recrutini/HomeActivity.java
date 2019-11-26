@@ -46,16 +46,18 @@ public class HomeActivity extends AppCompatActivity {
                     @Override
                     public void onResponse(String response) {
                         JSONArray res = null;
-                        offerNames = new String[response.length()];
-                        offerDescriptions = new String[response.length()];
-                        offerImgsUrls = new String[response.length()];
                         try {
                             res = new JSONArray(response);
+                            offerNames = new String[res.length()];
+                            offerDescriptions = new String[res.length()];
+                            offerImgsUrls = new String[res.length()];
+                            Log.d("res_len", Integer.toString(res.length()));
                             for (int i = 0; i < res.length(); i++)
                             {
                                 offerNames[i] = res.getJSONObject(i).getString("nom");
                                 offerDescriptions[i] = res.getJSONObject(i).optString("description");
                                 offerImgsUrls[i] = res.getJSONObject(i).optString("img_url");
+                                Log.d("img_url_ha",res.getJSONObject(i).optString("img_url"));
                             }
                             ListViewAdapter listViewAdapter = new ListViewAdapter(thisActivity,offerNames,offerDescriptions,offerImgsUrls);
                             lst.setAdapter(listViewAdapter);

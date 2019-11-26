@@ -2,7 +2,11 @@ package sabrine.chams.recrutini;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
+import android.os.AsyncTask;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,8 +17,15 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.google.android.material.snackbar.Snackbar;
+
+import java.io.IOException;
 import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
+
+import static com.android.volley.VolleyLog.TAG;
 
 public class ListViewAdapter extends ArrayAdapter<String> {
     private String[] offernames;
@@ -46,20 +57,10 @@ public class ListViewAdapter extends ArrayAdapter<String> {
             viewHolder = (ViewHolder) r.getTag();
         viewHolder.name.setText(offernames[position]);
         viewHolder.description.setText(descriptions[position]);
-        viewHolder.img.setImageDrawable(loadImageFromUrl(imgUrls[position],Integer.toString(position)));
+        SendHttpRequestTask sh = new SendHttpRequestTask();
+        sh.setImageView(viewHolder.img);
+        sh.execute(imgUrls[position]);
         return r;
-    }
-
-    private Drawable loadImageFromUrl(String url, String img_id)
-    {
-        try {
-            InputStream is = (InputStream) new URL(url).getContent();
-            Drawable d = Drawable.createFromStream(is, img_id);
-            return d;
-        } catch (Exception e)
-        {
-            return null;
-        }
     }
     class ViewHolder{
         TextView name;
@@ -70,6 +71,33 @@ public class ListViewAdapter extends ArrayAdapter<String> {
             name = v.findViewById(R.id.offer_name);
             description = v.findViewById(R.id.offer_desc);
             img = v.findViewById(R.id.offer_img);
+        }
+    }
+    private class SendHttpRequestTask extends AsyncTask<String, Void, Bitmap> {
+        ImageView v;
+        @Override
+        protected Bitmap doInBackground(String... params) {
+            try {
+                URL url = new URL(params[0]);
+                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                connection.setDoInput(true);
+                connection.connect();
+                InputStream input = connection.getInputStream();
+                Bitmap myBitmap = BitmapFactory.decodeStream(input);
+                return myBitmap;
+            }catch (Exception e){
+                Log.d(TAG,e.getMessage());
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Bitmap result) {
+            v.setImageBitmap(result);
+        }
+        void setImageView(ImageView v)
+        {
+            this.v = v;
         }
     }
 }
