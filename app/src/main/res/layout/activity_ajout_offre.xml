@@ -9,7 +9,7 @@
 
     <ImageView
         android:id="@+id/imageView4"
-        android:layout_width="404dp"
+        android:layout_width="0dp"
         android:layout_height="151dp"
         android:scaleType="fitXY"
         app:layout_constraintEnd_toEndOf="parent"
@@ -58,7 +58,7 @@
                     android:id="@+id/date_embauche"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Hiring date" />
+                    android:hint="Expiration date" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <LinearLayout

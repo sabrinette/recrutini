@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -58,7 +59,7 @@ public class LoginActivity extends AppCompatActivity {
                 RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
                 final String emailText = email.getText().toString();
                 final String passwordText = new BigInteger(1,md.digest(password.getText().toString().getBytes())).toString(16);
-                StringRequest postRequest = new StringRequest(Request.Method.POST, "https://sabrine-chams.alwaysdata.net/login.php",
+                StringRequest postRequest = new StringRequest(Request.Method.POST, "http://sabrine-chams.alwaysdata.net/login.php",
                         new Response.Listener<String>() {
                             @Override
                             public void onResponse(String response) {
@@ -70,6 +71,7 @@ public class LoginActivity extends AppCompatActivity {
                                     if ( userExists.equals("1") && validUser.equals("1") )
                                     {
                                         int id = Integer.parseInt(user.getString("id_societe"));
+                                        //SharedPreferences.Editor editor = sharedPreferences
                                         Intent registerActivity = new Intent( getApplicationContext(), HomeActivity.class);
                                         startActivity(registerActivity);
                                     }
