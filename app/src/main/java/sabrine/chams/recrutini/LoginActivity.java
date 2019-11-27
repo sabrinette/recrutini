@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -70,7 +71,8 @@ public class LoginActivity extends AppCompatActivity {
                                     if ( userExists.equals("1") && validUser.equals("1") )
                                     {
                                         int id = Integer.parseInt(user.getString("id_societe"));
-                                        Intent registerActivity = new Intent( getApplicationContext(), RegisterActivity.class);
+                                        //SharedPreferences.Editor editor = sharedPreferences
+                                        Intent registerActivity = new Intent( getApplicationContext(), HomeActivity.class);
                                         startActivity(registerActivity);
                                     }
                                     else if (userExists.equals("1") && validUser.equals("0")){

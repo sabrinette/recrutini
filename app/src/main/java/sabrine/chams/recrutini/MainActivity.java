@@ -43,7 +43,7 @@ public class MainActivity extends AppCompatActivity
         btnAnim = AnimationUtils.loadAnimation(getApplicationContext(),R.anim.button_animation);
         final List<ScreenItem> mList = new ArrayList<>();
         mList.add( new ScreenItem("Are you looking for an internship?" ,"recrutini helps you to find one" , R.drawable.stage ));
-        mList.add( new ScreenItem("Are you looking you for a job?" ,"recrutini helps you to find one" , R.drawable.job));
+        mList.add( new ScreenItem("Are you looking for a job?" ,"recrutini helps you to find one" , R.drawable.job));
         mList.add( new ScreenItem("We're looking for you","Join us" , R.drawable.hiring));
         screenPager = findViewById(R.id.screen_viewpager);
         introViewPagerAdapter =  new IntroViewPagerAdapter(this,mList);
@@ -94,7 +94,7 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onClick(View v)
             {
-                Intent homeActivity = new Intent(getApplicationContext(), HomeActivity.class) ;
+                Intent homeActivity = new Intent(getApplicationContext(), RegisterActivity.class) ;
                 startActivity(homeActivity);
             }
         });
