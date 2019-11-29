@@ -1,7 +1,11 @@
 package sabrine.chams.recrutini;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
 
 import android.content.Intent;
 import android.database.Cursor;
@@ -12,6 +16,7 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Base64;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -23,6 +28,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.snackbar.SnackbarContentLayout;
 import com.google.android.material.textfield.TextInputEditText;
@@ -43,7 +49,8 @@ import java.util.Map;
 public class RegisterActivity extends AppCompatActivity {
 
     private static final int THUMBNAIL_SIZE = 1000;
-    ConstraintLayout registerPage ;
+    DrawerLayout registerPage ;
+    ActionBarDrawerToggle mToggle;
     TextInputEditText email;
     TextInputEditText password;
     TextInputEditText name;
@@ -68,6 +75,39 @@ public class RegisterActivity extends AppCompatActivity {
         address = findViewById(R.id.address);
         phoneNumber = findViewById(R.id.phone_number);
         registerPage = findViewById(R.id.register_page);
+        mToggle = new ActionBarDrawerToggle(this, registerPage, R.string.open, R.string.close);
+        registerPage.addDrawerListener(mToggle);
+        mToggle.syncState();
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        NavigationView navigationView = findViewById(R.id.navigation_view);
+        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
+                switch (menuItem.getItemId())
+                {
+                    case R.id.nav_login:
+                    {
+                        Intent loginActivity = new Intent( getApplicationContext(), LoginActivity.class);
+                        startActivity(loginActivity);
+                    }
+                    break;
+                    case R.id.nav_Register:
+                    {
+                        Intent registerrActivity = new Intent( getApplicationContext(), RegisterActivity.class);
+                        startActivity(registerrActivity);
+                    }
+                    break;
+                    case R.id.nav_offer_lst:
+                    {
+                        Intent homeActivity = new Intent( getApplicationContext(), HomeActivity.class);
+                        startActivity(homeActivity);
+                    }
+                    break;
+                }
+                registerPage.closeDrawer(GravityCompat.START);
+                return true;
+            }
+        });
         confirmRegister = findViewById(R.id.confirm_register);
         uploadBtn = findViewById(R.id.upload_btn);
         goLogin = findViewById(R.id.go_to_login);
@@ -228,5 +268,12 @@ public class RegisterActivity extends AppCompatActivity {
         int k = Integer.highestOneBit((int)Math.floor(ratio));
         if(k==0) return 1;
         else return k;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (mToggle.onOptionsItemSelected(item))
+            return true;
+        return super.onOptionsItemSelected(item);
     }
 }

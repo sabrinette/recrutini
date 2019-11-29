@@ -1,11 +1,16 @@
 package sabrine.chams.recrutini;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -17,6 +22,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputEditText;
 
@@ -35,6 +41,8 @@ import java.util.Queue;
 public class LoginActivity extends AppCompatActivity {
 
     ConstraintLayout loginPage ;
+    DrawerLayout loginPageDr;
+    ActionBarDrawerToggle mToggle;
     TextInputEditText email;
     TextInputEditText password;
     TextView goRegiter;
@@ -45,6 +53,40 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
         email = findViewById(R.id.email);
         loginPage = findViewById(R.id.login_page);
+        loginPageDr = findViewById(R.id.login_page_dr);
+        mToggle = new ActionBarDrawerToggle(this, loginPageDr, R.string.open, R.string.close);
+        loginPageDr.addDrawerListener(mToggle);
+        mToggle.syncState();
+        NavigationView navigationView = findViewById(R.id.navigation_view);
+        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
+                switch (menuItem.getItemId())
+                {
+                    case R.id.nav_login:
+                    {
+                        Intent loginActivity = new Intent( getApplicationContext(), LoginActivity.class);
+                        startActivity(loginActivity);
+                    }
+                    break;
+                    case R.id.nav_Register:
+                    {
+                        Intent registerrActivity = new Intent( getApplicationContext(), RegisterActivity.class);
+                        startActivity(registerrActivity);
+                    }
+                    break;
+                    case R.id.nav_offer_lst:
+                    {
+                        Intent homeActivity = new Intent( getApplicationContext(), HomeActivity.class);
+                        startActivity(homeActivity);
+                    }
+                    break;
+                }
+                loginPageDr.closeDrawer(GravityCompat.START);
+                return true;
+            }
+        });
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         password = findViewById(R.id.password);
         confirmLogin = findViewById(R.id.confirm_login);
         confirmLogin.setOnClickListener(new View.OnClickListener() {
@@ -118,5 +160,12 @@ public class LoginActivity extends AppCompatActivity {
                 startActivity(registerActivity);
             }
         });
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (mToggle.onOptionsItemSelected(item))
+            return true;
+        return super.onOptionsItemSelected(item);
     }
 }
