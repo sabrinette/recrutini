@@ -84,6 +84,7 @@ public class ListViewAdapter extends ArrayAdapter<String> {
                 connection.connect();
                 InputStream input = connection.getInputStream();
                 Bitmap myBitmap = BitmapFactory.decodeStream(input);
+                connection.disconnect();
                 return myBitmap;
             }catch (Exception e){
                 Log.d(TAG,e.getMessage());

@@ -42,7 +42,7 @@ import java.util.Map;
 
 public class RegisterActivity extends AppCompatActivity {
 
-    private static final int THUMBNAIL_SIZE = 1000000;
+    private static final int THUMBNAIL_SIZE = 1000;
     ConstraintLayout registerPage ;
     TextInputEditText email;
     TextInputEditText password;
@@ -210,12 +210,12 @@ public class RegisterActivity extends AppCompatActivity {
             return null;
         }
 
-        //int originalSize = (onlyBoundsOptions.outHeight > onlyBoundsOptions.outWidth) ? onlyBoundsOptions.outHeight : onlyBoundsOptions.outWidth;
+        int originalSize = (onlyBoundsOptions.outHeight > onlyBoundsOptions.outWidth) ? onlyBoundsOptions.outHeight : onlyBoundsOptions.outWidth;
 
-        //double ratio = (originalSize > THUMBNAIL_SIZE) ? (originalSize / THUMBNAIL_SIZE) : 1.0;
+        double ratio = (originalSize > THUMBNAIL_SIZE) ? (originalSize / THUMBNAIL_SIZE) : 1.0;
 
         BitmapFactory.Options bitmapOptions = new BitmapFactory.Options();
-        bitmapOptions.inSampleSize = 1;//getPowerOfTwoForSampleRatio(ratio);
+        bitmapOptions.inSampleSize = getPowerOfTwoForSampleRatio(ratio);
         //bitmapOptions.inDither = true; //optional
         bitmapOptions.inPreferredConfig=Bitmap.Config.ARGB_8888;//
         input = this.getContentResolver().openInputStream(uri);

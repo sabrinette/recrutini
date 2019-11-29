@@ -7,6 +7,7 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -27,7 +28,7 @@ import java.util.Map;
 
 public class HomeActivity extends AppCompatActivity {
 
-    ConstraintLayout homePage;
+    RelativeLayout homePage;
     ListView lst;
     String[] offerNames;
     String[] offerDescriptions;
