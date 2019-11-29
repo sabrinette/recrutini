@@ -12,6 +12,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -42,6 +44,7 @@ public class HomeActivity extends AppCompatActivity {
     String[] offerNames;
     String[] offerDescriptions;
     String[] offerImgsUrls;
+    String[] offerIDs;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -94,6 +97,7 @@ public class HomeActivity extends AppCompatActivity {
                             offerNames = new String[res.length()];
                             offerDescriptions = new String[res.length()];
                             offerImgsUrls = new String[res.length()];
+                            offerIDs = new String[res.length()];
                             if(res.length() > 0)
                             {
                                 for (int i = 0; i < res.length(); i++)
@@ -101,8 +105,9 @@ public class HomeActivity extends AppCompatActivity {
                                     offerNames[i] = res.getJSONObject(i).getString("nom");
                                     offerDescriptions[i] = res.getJSONObject(i).optString("description");
                                     offerImgsUrls[i] = res.getJSONObject(i).optString("img_url");
+                                    offerIDs[i] = res.getJSONObject(i).optString("id");
                                 }
-                                ListViewAdapter listViewAdapter = new ListViewAdapter(thisActivity,offerNames,offerDescriptions,offerImgsUrls);
+                                ListViewAdapter listViewAdapter = new ListViewAdapter(thisActivity,offerNames,offerDescriptions,offerImgsUrls,offerIDs);
                                 lst.setAdapter(listViewAdapter);
                             }
                             else
@@ -133,7 +138,15 @@ public class HomeActivity extends AppCompatActivity {
                     }
                 });
         queue.add(jsonRequest);
-
+        lst.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                TextView offer_id = view.findViewById(R.id.offer_id);
+                Intent offerActivity = new Intent( getApplicationContext(), Offre.class);
+                offerActivity.putExtra("id", offer_id.getText().toString());
+                startActivity(offerActivity);
+            }
+        });
     }
 
     @Override

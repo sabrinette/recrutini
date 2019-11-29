@@ -94,7 +94,7 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onClick(View v)
             {
-                Intent homeActivity = new Intent(getApplicationContext(), ProfileSociete.class) ;
+                Intent homeActivity = new Intent(getApplicationContext(), HomeActivity.class) ;
                 startActivity(homeActivity);
             }
         });

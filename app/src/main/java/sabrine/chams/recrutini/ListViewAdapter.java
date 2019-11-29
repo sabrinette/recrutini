@@ -31,14 +31,16 @@ public class ListViewAdapter extends ArrayAdapter<String> {
     private String[] offernames;
     private String[] descriptions;
     private String[] imgUrls;
+    private String[] IDs;
     private Activity context;
 
-    public ListViewAdapter(Activity context, String[] offernames, String[] descriptions, String[] imgUrls) {
+    public ListViewAdapter(Activity context, String[] offernames, String[] descriptions, String[] imgUrls,String[] IDs) {
         super(context, R.layout.listview_layout, offernames);
         this.context = context;
         this.offernames = offernames;
         this.descriptions = descriptions;
         this.imgUrls = imgUrls;
+        this.IDs = IDs;
     }
 
     @NonNull
@@ -57,6 +59,7 @@ public class ListViewAdapter extends ArrayAdapter<String> {
             viewHolder = (ViewHolder) r.getTag();
         viewHolder.name.setText(offernames[position]);
         viewHolder.description.setText(descriptions[position]);
+        viewHolder.id.setText(IDs[position]);
         SendHttpRequestTask sh = new SendHttpRequestTask();
         sh.setImageView(viewHolder.img);
         sh.execute(imgUrls[position]);
@@ -65,40 +68,14 @@ public class ListViewAdapter extends ArrayAdapter<String> {
     class ViewHolder{
         TextView name;
         TextView description;
+        TextView id;
         ImageView img;
         ViewHolder(View v)
         {
             name = v.findViewById(R.id.offer_name);
             description = v.findViewById(R.id.offer_desc);
             img = v.findViewById(R.id.offer_img);
-        }
-    }
-    private class SendHttpRequestTask extends AsyncTask<String, Void, Bitmap> {
-        ImageView v;
-        @Override
-        protected Bitmap doInBackground(String... params) {
-            try {
-                URL url = new URL(params[0]);
-                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-                connection.setDoInput(true);
-                connection.connect();
-                InputStream input = connection.getInputStream();
-                Bitmap myBitmap = BitmapFactory.decodeStream(input);
-                connection.disconnect();
-                return myBitmap;
-            }catch (Exception e){
-                Log.d(TAG,e.getMessage());
-            }
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Bitmap result) {
-            v.setImageBitmap(result);
-        }
-        void setImageView(ImageView v)
-        {
-            this.v = v;
+            id = v.findViewById(R.id.offer_id);
         }
     }
 }
