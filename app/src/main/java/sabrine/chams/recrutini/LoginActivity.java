@@ -59,7 +59,7 @@ public class LoginActivity extends AppCompatActivity {
                 RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
                 final String emailText = email.getText().toString();
                 final String passwordText = new BigInteger(1,md.digest(password.getText().toString().getBytes())).toString(16);
-                StringRequest postRequest = new StringRequest(Request.Method.POST, "http://sabrine-chams.alwaysdata.net/login.php",
+                StringRequest postRequest = new StringRequest(Request.Method.POST, "https://sabrine-chams.alwaysdata.net/login.php",
                         new Response.Listener<String>() {
                             @Override
                             public void onResponse(String response) {
