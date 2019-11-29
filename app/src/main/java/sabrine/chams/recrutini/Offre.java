@@ -2,13 +2,19 @@ package sabrine.chams.recrutini;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
+import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -27,6 +33,7 @@ import java.util.Map;
 
 public class Offre extends AppCompatActivity {
 
+    private static final int REQUEST_CALL =1;
     TextView name;
     TextView type;
     TextView description;
@@ -64,7 +71,7 @@ public class Offre extends AppCompatActivity {
                             String  description_offre = offre.getString("description");
                             String date_offre = offre.getString("debut_embauche");
                             final String e_mail = offre.getString("email");
-                            String telephone = offre.getString("num_tel");
+                            final String number = offre.getString("num_tel");
                             name.setText(nom);
                             address.setText(adresse);
                             type.setText(type_offre);
@@ -83,7 +90,19 @@ public class Offre extends AppCompatActivity {
 
                             phone.setOnClickListener(new View.OnClickListener() {
                                 @Override
-                                public void onClick(View v) {
+                                public void onClick(View v)
+                                {
+                                    if (number.trim().length()>0) {
+                                        if(ContextCompat.checkSelfPermission(Offre.this , Manifest.permission.CALL_PHONE ) != PackageManager.PERMISSION_GRANTED){
+                                            ActivityCompat.requestPermissions(Offre.this , new String[] {Manifest.permission.CALL_PHONE} , REQUEST_CALL);
+                                        }
+                                        else {
+                                            String dial = "tel:" + number ;
+                                            startActivity( new Intent(Intent.ACTION_CALL , Uri.parse(dial))); }
+
+                                    } else {
+                                        Snackbar.make( OffrePage ," Invalid phone number !" , Snackbar.LENGTH_LONG).show();
+                                    }
 
                                 }
                             });
