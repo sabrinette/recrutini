@@ -1,9 +1,12 @@
 package sabrine.chams.recrutini;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
@@ -15,6 +18,7 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.android.material.snackbar.Snackbar;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -28,9 +32,10 @@ public class Offre extends AppCompatActivity {
     TextView description;
     TextView address;
     TextView date;
+    ConstraintLayout OffrePage ;
     ImageButton mail;
     ImageButton phone;
-    int id = 5;
+    int id = 3;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,14 +48,51 @@ public class Offre extends AppCompatActivity {
         mail = findViewById(R.id.mail);
         phone = findViewById(R.id.phone);
         date = findViewById(R.id.date_expiration);
-
+        OffrePage = findViewById(R.id.page_offre);
         RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
-        StringRequest postRequest = new StringRequest(Request.Method.POST, "http://sabrine-chams.alwaysdata.net/get_offre_by_id.php",
+        StringRequest postRequest = new StringRequest(Request.Method.POST, "https://sabrine-chams.alwaysdata.net/get_offre_by_id.php",
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
-                        JSONObject user = null;
+                        JSONArray res = null;
+                        try {
+                            res = new JSONArray(response);
+                            JSONObject offre = res.getJSONObject(0);
+                            String nom = offre.getString("nom");
+                            String adresse = offre.getString("adresse");
+                            String type_offre = offre.getString("type");
+                            String  description_offre = offre.getString("description");
+                            String date_offre = offre.getString("debut_embauche");
+                            final String e_mail = offre.getString("email");
+                            String telephone = offre.getString("num_tel");
+                            name.setText(nom);
+                            address.setText(adresse);
+                            type.setText(type_offre);
+                            description.setText(description_offre);
+                            date.setText(date_offre);
+                            mail.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    Snackbar.make( OffrePage ," parsing Json  !" , Snackbar.LENGTH_LONG).show();
+                                    Intent intent = null ;
+                                    intent = new Intent(Intent.ACTION_SENDTO);
+                                    intent.setData(Uri.parse("mailto:"+ e_mail));
+                                    startActivity(intent);
+                                }
+                            });
 
+                            phone.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+
+                                }
+                            });
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                            Snackbar.make( OffrePage ," parsing Json failed !" , Snackbar.LENGTH_LONG).show();
+
+                        }
 
                     }
                 },
@@ -66,5 +108,6 @@ public class Offre extends AppCompatActivity {
             }
 
         };
+        queue.add(postRequest);
     }
 }
