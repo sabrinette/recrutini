@@ -2,4 +2,7 @@
     <string name="app_name">recrutini</string>
     <string name="open">Open</string>
     <string name="close">Close</string>
+    <string name="profile">Profile</string>
+    <string name="logout">Logout</string>
+    <string name="add_offer">Add offer</string>
 </resources>

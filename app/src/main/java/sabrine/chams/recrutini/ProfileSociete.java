@@ -1,18 +1,27 @@
 package sabrine.chams.recrutini;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.android.volley.Request;
@@ -21,6 +30,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
@@ -37,19 +47,61 @@ import java.util.Map;
 
 public class ProfileSociete extends AppCompatActivity {
 
+    DrawerLayout profilePageDr;
+    ActionBarDrawerToggle mToggle;
     TextView name ;
     TextInputEditText adresse ;
     TextInputEditText numero ;
     TextInputEditText pwd ;
     TextInputEditText confirm_pwd ;
+    ImageView img;
     Button update ;
     ConstraintLayout profilePage ;
-    int id = 3 ;
+    String id;
+    SharedPreferences sharedPreferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile_societe);
+        profilePageDr = findViewById(R.id.profile_page_dr);
+        sharedPreferences = getSharedPreferences(LoginActivity.pref, Context.MODE_PRIVATE);
+        if (sharedPreferences.contains("id"))
+            id = sharedPreferences.getString("id", null);
+        mToggle = new ActionBarDrawerToggle(this, profilePageDr, R.string.open, R.string.close);
+        profilePageDr.addDrawerListener(mToggle);
+        mToggle.syncState();
+        NavigationView navigationView = findViewById(R.id.navigation_view);
+        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
+                switch (menuItem.getItemId())
+                {
+                    case R.id.nav_login:
+                    {
+                        Intent loginActivity = new Intent( getApplicationContext(), LoginActivity.class);
+                        startActivity(loginActivity);
+                    }
+                    break;
+                    case R.id.nav_Register:
+                    {
+                        Intent registerrActivity = new Intent( getApplicationContext(), RegisterActivity.class);
+                        startActivity(registerrActivity);
+                    }
+                    break;
+                    case R.id.nav_offer_lst:
+                    {
+                        Intent homeActivity = new Intent( getApplicationContext(), HomeActivity.class);
+                        startActivity(homeActivity);
+                    }
+                    break;
+                }
+                profilePageDr.closeDrawer(GravityCompat.START);
+                return true;
+            }
+        });
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        img = findViewById(R.id.profile_img);
         name = findViewById(R.id.nom_entreprise);
         adresse = findViewById(R.id.address);
         numero = findViewById(R.id.num_telephone);
@@ -66,10 +118,14 @@ public class ProfileSociete extends AppCompatActivity {
                         JSONArray res = null;
                         try {
                             res = new JSONArray(response);
-                            JSONObject offre = res.getJSONObject(0);
-                            String nom_societe = offre.getString("nom");
-                            String adresse_societe = offre.getString("adresse");
-                            final String number = offre.getString("num_tel");
+                            JSONObject societe = res.getJSONObject(0);
+                            String nom_societe = societe.getString("nom");
+                            String adresse_societe = societe.getString("adresse");
+                            final String number = societe.getString("num_tel");
+                            String img_url = societe.getString("img_url");
+                            SendHttpRequestTask sh = new SendHttpRequestTask();
+                            sh.setImageView(img);
+                            sh.execute(img_url);
                             name.setText(nom_societe);
                             adresse.setText(adresse_societe);
                             numero.setText(number);
@@ -89,7 +145,7 @@ public class ProfileSociete extends AppCompatActivity {
             @Override
             protected Map<String, String> getParams() {
                 Map<String, String> params = new HashMap<String, String>();
-                params.put("id", Integer.toString(id));
+                params.put("id", id);
                 return params;
             }
 
@@ -123,8 +179,8 @@ public class ProfileSociete extends AppCompatActivity {
                                     String success = res.getString("success");
                                     if ( success.equals("1"))
                                     {
-                                        Intent loginActivity = new Intent( getApplicationContext(), LoginActivity.class);
-                                        startActivity(loginActivity);
+                                        Intent homeActivity = new Intent( getApplicationContext(), HomeActivity.class);
+                                        startActivity(homeActivity);
                                     }
                                     else if (success.equals("2")){
                                         Snackbar.make(profilePage ," This account already exists !" , Snackbar.LENGTH_LONG).show();
@@ -153,7 +209,7 @@ public class ProfileSociete extends AppCompatActivity {
                         params.put("adresse", addressText);
                         params.put("nom", nameText);
                         params.put("num_tel", phoneNumberText);
-                        params.put("id", Integer.toString(id));
+                        params.put("id", id);
                         return params;
                     }
                 };
@@ -166,5 +222,42 @@ public class ProfileSociete extends AppCompatActivity {
             }
         });
 
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (mToggle.onOptionsItemSelected(item))
+            return true;
+        return super.onOptionsItemSelected(item);
+    }
+    public void logout(MenuItem item)
+    {
+        sharedPreferences = getSharedPreferences(LoginActivity.pref, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.clear();
+        editor.commit();
+        Intent loginActivity = new Intent( getApplicationContext(), LoginActivity.class);
+        startActivity(loginActivity);
+    }
+
+    public void profile(MenuItem item)
+    {
+        Intent profileSociete = new Intent( getApplicationContext(), ProfileSociete.class);
+        startActivity(profileSociete);
+    }
+
+    public void goToAddOffer(MenuItem item)
+    {
+        Intent addOffer = new Intent( getApplicationContext(), AjoutOffre.class);
+        startActivity(addOffer);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        sharedPreferences = getSharedPreferences(LoginActivity.pref, Context.MODE_PRIVATE);
+        if (sharedPreferences.contains("id")) {
+            getMenuInflater().inflate(R.menu.right_menu, menu);
+        }
+        return true;
     }
 }

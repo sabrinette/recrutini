@@ -8,9 +8,12 @@ import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -45,12 +48,19 @@ public class HomeActivity extends AppCompatActivity {
     String[] offerDescriptions;
     String[] offerImgsUrls;
     String[] offerIDs;
+    String   company_id = "null";
+    SharedPreferences sharedPreferences;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
-        lst = findViewById(R.id.listview);
         homePage = findViewById(R.id.home_page);
+        sharedPreferences = getSharedPreferences(LoginActivity.pref, Context.MODE_PRIVATE);
+        if (sharedPreferences.contains("id")) {
+            company_id = sharedPreferences.getString("id", null);
+            Snackbar.make(homePage,"You are loged in",Snackbar.LENGTH_LONG).show();
+        }
+        lst = findViewById(R.id.listview);
         mToggle = new ActionBarDrawerToggle(this, homePage, R.string.open, R.string.close);
         homePage.addDrawerListener(mToggle);
         mToggle.syncState();
@@ -87,7 +97,7 @@ public class HomeActivity extends AppCompatActivity {
         final Activity thisActivity = this;
 
         RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
-        StringRequest jsonRequest = new StringRequest(Request.Method.GET, "https://sabrine-chams.alwaysdata.net/get_offre.php",
+        StringRequest jsonRequest = new StringRequest(Request.Method.POST, "https://sabrine-chams.alwaysdata.net/get_offre.php",
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
@@ -136,7 +146,17 @@ public class HomeActivity extends AppCompatActivity {
                         homePage.addView(tv);
                         Snackbar.make(homePage, error.getMessage(), 15000).show();
                     }
-                });
+                }){
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<String, String>();
+                Log.d("id_societe !!",company_id);
+                if (company_id != null)
+                    params.put("id", company_id);
+                else
+                    params.put("id", "null");
+                return params;
+            }};
         queue.add(jsonRequest);
         lst.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -154,5 +174,35 @@ public class HomeActivity extends AppCompatActivity {
         if (mToggle.onOptionsItemSelected(item))
             return true;
         return super.onOptionsItemSelected(item);
+    }
+    public void logout(MenuItem item)
+    {
+        sharedPreferences = getSharedPreferences(LoginActivity.pref, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.clear();
+        editor.commit();
+        Intent loginActivity = new Intent( getApplicationContext(), LoginActivity.class);
+        startActivity(loginActivity);
+    }
+
+    public void profile(MenuItem item)
+    {
+        Intent profileSociete = new Intent( getApplicationContext(), ProfileSociete.class);
+        startActivity(profileSociete);
+    }
+
+    public void goToAddOffer(MenuItem item)
+    {
+        Intent addOffer = new Intent( getApplicationContext(), AjoutOffre.class);
+        startActivity(addOffer);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        sharedPreferences = getSharedPreferences(LoginActivity.pref, Context.MODE_PRIVATE);
+        if (sharedPreferences.contains("id")) {
+            getMenuInflater().inflate(R.menu.right_menu, menu);
+        }
+        return true;
     }
 }

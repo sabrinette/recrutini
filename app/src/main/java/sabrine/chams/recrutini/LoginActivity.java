@@ -7,6 +7,7 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -47,10 +48,16 @@ public class LoginActivity extends AppCompatActivity {
     TextInputEditText password;
     TextView goRegiter;
     Button confirmLogin;
+    SharedPreferences sharedPreferences;
+    public static final String pref = "user_id";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+        sharedPreferences = getSharedPreferences(pref, Context.MODE_PRIVATE);
+        final Intent homeActivity = new Intent( getApplicationContext(), HomeActivity.class);
+        if (sharedPreferences.contains("id"))
+            startActivity(homeActivity);
         email = findViewById(R.id.email);
         loginPage = findViewById(R.id.login_page);
         loginPageDr = findViewById(R.id.login_page_dr);
@@ -112,10 +119,10 @@ public class LoginActivity extends AppCompatActivity {
                                     String validUser = user.getString("valid_user");
                                     if ( userExists.equals("1") && validUser.equals("1") )
                                     {
-                                        int id = Integer.parseInt(user.getString("id_societe"));
-                                        //SharedPreferences.Editor editor = sharedPreferences
-                                        Intent registerActivity = new Intent( getApplicationContext(), HomeActivity.class);
-                                        startActivity(registerActivity);
+                                        SharedPreferences.Editor editor = sharedPreferences.edit();
+                                        editor.putString("id", user.getString("id_societe"));
+                                        editor.commit();
+                                        startActivity(homeActivity);
                                     }
                                     else if (userExists.equals("1") && validUser.equals("0")){
                                         password.setError("Wrong password ! Try again");

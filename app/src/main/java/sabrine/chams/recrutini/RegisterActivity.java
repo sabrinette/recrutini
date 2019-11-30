@@ -7,7 +7,9 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -64,10 +66,16 @@ public class RegisterActivity extends AppCompatActivity {
     String picturePath;
     Bitmap photo;
     String imgExtn;
+    SharedPreferences sharedPreferences;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
+        sharedPreferences = getSharedPreferences(LoginActivity.pref, Context.MODE_PRIVATE);
+        final Intent homeActivity = new Intent( getApplicationContext(), HomeActivity.class);
+        if (sharedPreferences.contains("id"))
+            startActivity(homeActivity);
         email = findViewById(R.id.email);
         password = findViewById(R.id.password);
         name = findViewById(R.id.name);
