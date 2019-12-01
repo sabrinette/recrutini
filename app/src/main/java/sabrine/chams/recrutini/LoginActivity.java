@@ -56,8 +56,10 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
         sharedPreferences = getSharedPreferences(pref, Context.MODE_PRIVATE);
         final Intent homeActivity = new Intent( getApplicationContext(), HomeActivity.class);
-        if (sharedPreferences.contains("id"))
+        if (sharedPreferences.contains("id")) {
+            homeActivity.putExtra("login","true");
             startActivity(homeActivity);
+        }
         email = findViewById(R.id.email);
         loginPage = findViewById(R.id.login_page);
         loginPageDr = findViewById(R.id.login_page_dr);
@@ -122,6 +124,7 @@ public class LoginActivity extends AppCompatActivity {
                                         SharedPreferences.Editor editor = sharedPreferences.edit();
                                         editor.putString("id", user.getString("id_societe"));
                                         editor.commit();
+                                        homeActivity.putExtra("login", "true");
                                         startActivity(homeActivity);
                                     }
                                     else if (userExists.equals("1") && validUser.equals("0")){
@@ -174,5 +177,18 @@ public class LoginActivity extends AppCompatActivity {
         if (mToggle.onOptionsItemSelected(item))
             return true;
         return super.onOptionsItemSelected(item);
+    }
+
+    public void offerLstJob(MenuItem item)
+    {
+        Intent homeActivity = new Intent( getApplicationContext(), HomeActivity.class);
+        homeActivity.putExtra("type", "Job");
+        startActivity(homeActivity);
+    }
+    public void offerLstInternship(MenuItem item)
+    {
+        Intent homeActivity = new Intent( getApplicationContext(), HomeActivity.class);
+        homeActivity.putExtra("type", "Internship");
+        startActivity(homeActivity);
     }
 }

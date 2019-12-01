@@ -1,9 +1,13 @@
 package sabrine.chams.recrutini;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
 
 import android.Manifest;
 import android.content.Context;
@@ -13,6 +17,8 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -25,6 +31,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.Snackbar;
 
 import org.json.JSONArray;
@@ -41,9 +48,12 @@ public class Offre extends AppCompatActivity {
     TextView type;
     TextView description;
     TextView address;
+    SharedPreferences sharedPreferences;
     TextView date;
     ImageView img;
     ConstraintLayout OffrePage ;
+    DrawerLayout offrePageDr;
+    ActionBarDrawerToggle mToggle;
     ImageButton mail;
     ImageButton phone;
     String id;
@@ -62,13 +72,47 @@ public class Offre extends AppCompatActivity {
         phone = findViewById(R.id.phone);
         date = findViewById(R.id.date_expiration);
         OffrePage = findViewById(R.id.page_offre);
+        offrePageDr = findViewById(R.id.page_offre_dr);
+        sharedPreferences = getSharedPreferences(LoginActivity.pref, Context.MODE_PRIVATE);
+        mToggle = new ActionBarDrawerToggle(this, offrePageDr, R.string.open, R.string.close);
+        offrePageDr.addDrawerListener(mToggle);
+        mToggle.syncState();
+        NavigationView navigationView = findViewById(R.id.navigation_view);
+        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
+                switch (menuItem.getItemId())
+                {
+                    case R.id.nav_login:
+                    {
+                        Intent loginActivity = new Intent( getApplicationContext(), LoginActivity.class);
+                        startActivity(loginActivity);
+                    }
+                    break;
+                    case R.id.nav_Register:
+                    {
+                        Intent registerrActivity = new Intent( getApplicationContext(), RegisterActivity.class);
+                        startActivity(registerrActivity);
+                    }
+                    break;
+                    case R.id.nav_offer_lst:
+                    {
+                        Intent homeActivity = new Intent( getApplicationContext(), HomeActivity.class);
+                        startActivity(homeActivity);
+                    }
+                    break;
+                }
+                offrePageDr.closeDrawer(GravityCompat.START);
+                return true;
+            }
+        });
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         img = findViewById(R.id.img);
         RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
         StringRequest postRequest = new StringRequest(Request.Method.POST, "https://sabrine-chams.alwaysdata.net/get_offre_by_id.php",
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
-                        Log.d("toute la reponse", response);
                         JSONArray res = null;
                         try {
                             res = new JSONArray(response);
@@ -89,11 +133,9 @@ public class Offre extends AppCompatActivity {
                             type.setText(type_offre);
                             description.setText(description_offre);
                             date.setText(date_offre);
-                            Log.d("nom de l'entreprise",nom);
                             mail.setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View v) {
-                                    Snackbar.make( OffrePage ," parsing Json  !" , Snackbar.LENGTH_LONG).show();
                                     Intent intent = null ;
                                     intent = new Intent(Intent.ACTION_SENDTO);
                                     intent.setData(Uri.parse("mailto:"+ e_mail));
@@ -136,7 +178,6 @@ public class Offre extends AppCompatActivity {
             @Override
             protected Map<String, String> getParams() {
                 Map<String, String> params = new HashMap<String, String>();
-                Log.d("offer_id", id);
                 params.put("id", id);
                 return params;
             }
@@ -144,5 +185,54 @@ public class Offre extends AppCompatActivity {
         };
         queue.add(postRequest);
         queue.getCache().clear();
+    }
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (mToggle.onOptionsItemSelected(item))
+            return true;
+        return super.onOptionsItemSelected(item);
+    }
+    public void logout(MenuItem item)
+    {
+        sharedPreferences = getSharedPreferences(LoginActivity.pref, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.clear();
+        editor.commit();
+        Intent loginActivity = new Intent( getApplicationContext(), LoginActivity.class);
+        startActivity(loginActivity);
+    }
+
+    public void profile(MenuItem item)
+    {
+        Intent profileSociete = new Intent( getApplicationContext(), ProfileSociete.class);
+        startActivity(profileSociete);
+    }
+
+    public void goToAddOffer(MenuItem item)
+    {
+        Intent addOffer = new Intent( getApplicationContext(), AjoutOffre.class);
+        startActivity(addOffer);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        sharedPreferences = getSharedPreferences(LoginActivity.pref, Context.MODE_PRIVATE);
+        if (sharedPreferences.contains("id")) {
+            getMenuInflater().inflate(R.menu.right_menu, menu);
+        }
+        return true;
+    }
+
+    public void offerLstJob(MenuItem item)
+    {
+        Intent homeActivity = new Intent( getApplicationContext(), HomeActivity.class);
+        homeActivity.putExtra("type", "Job");
+        startActivity(homeActivity);
+    }
+    public void offerLstInternship(MenuItem item)
+    {
+        Intent homeActivity = new Intent( getApplicationContext(), HomeActivity.class);
+        homeActivity.putExtra("type", "Internship");
+        startActivity(homeActivity);
     }
 }

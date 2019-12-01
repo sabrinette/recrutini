@@ -152,7 +152,6 @@ public class AjoutOffre extends AppCompatActivity {
                                             startActivity(loginActivity);
                                         }
                                         else {
-                                            Log.d("toute la requete", response);
                                             Snackbar.make(offerPage ," Addition failed !!" , Snackbar.LENGTH_LONG).show();
                                         }
 
@@ -223,9 +222,21 @@ public class AjoutOffre extends AppCompatActivity {
         return true;
     }
     private void updateLabel() {
-        String myFormat = "MM/dd/yy"; //In which you need put here
-        SimpleDateFormat sdf = new SimpleDateFormat(myFormat, Locale.US);
+        String myFormat = "MM/dd/yyyy"; //In which you need put here
+        SimpleDateFormat sdf = new SimpleDateFormat(myFormat);
 
-        dateEmbauche.setText(sdf.format(myCalendar.getTime()));
+        dateEmbauche.setText(sdf.format(myCalendar.getTimeInMillis()));
+    }
+    public void offerLstJob(MenuItem item)
+    {
+        Intent homeActivity = new Intent( getApplicationContext(), HomeActivity.class);
+        homeActivity.putExtra("type", "Job");
+        startActivity(homeActivity);
+    }
+    public void offerLstInternship(MenuItem item)
+    {
+        Intent homeActivity = new Intent( getApplicationContext(), HomeActivity.class);
+        homeActivity.putExtra("type", "Internship");
+        startActivity(homeActivity);
     }
 }

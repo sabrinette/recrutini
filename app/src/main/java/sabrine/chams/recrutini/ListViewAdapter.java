@@ -14,10 +14,16 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.res.TypedArrayUtils;
 
 import com.google.android.material.snackbar.Snackbar;
+
+import org.apache.commons.lang3.ArrayUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -35,7 +41,7 @@ public class ListViewAdapter extends ArrayAdapter<String> {
     private Activity context;
 
     public ListViewAdapter(Activity context, String[] offernames, String[] descriptions, String[] imgUrls,String[] IDs) {
-        super(context, R.layout.listview_layout, offernames);
+        super(context, R.layout.listview_layout, new ArrayList<String>(Arrays.asList(offernames)));
         this.context = context;
         this.offernames = offernames;
         this.descriptions = descriptions;
@@ -65,6 +71,16 @@ public class ListViewAdapter extends ArrayAdapter<String> {
         sh.execute(imgUrls[position]);
         return r;
     }
+
+    @Override
+    public void remove(@Nullable String object) {
+        super.remove(offernames[Integer.parseInt(object)]);
+        this.offernames = ArrayUtils.remove(offernames, Integer.parseInt(object));
+        this.descriptions = ArrayUtils.remove(descriptions, Integer.parseInt(object));
+        this.IDs = ArrayUtils.remove(IDs, Integer.parseInt(object));
+        this.imgUrls = ArrayUtils.remove(imgUrls, Integer.parseInt(object));
+    }
+
     class ViewHolder{
         TextView name;
         TextView description;

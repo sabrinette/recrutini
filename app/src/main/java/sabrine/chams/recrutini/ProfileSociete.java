@@ -260,4 +260,17 @@ public class ProfileSociete extends AppCompatActivity {
         }
         return true;
     }
+
+    public void offerLstJob(MenuItem item)
+    {
+        Intent homeActivity = new Intent( getApplicationContext(), HomeActivity.class);
+        homeActivity.putExtra("type", "Job");
+        startActivity(homeActivity);
+    }
+    public void offerLstInternship(MenuItem item)
+    {
+        Intent homeActivity = new Intent( getApplicationContext(), HomeActivity.class);
+        homeActivity.putExtra("type", "Internship");
+        startActivity(homeActivity);
+    }
 }

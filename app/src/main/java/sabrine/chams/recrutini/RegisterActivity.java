@@ -74,8 +74,10 @@ public class RegisterActivity extends AppCompatActivity {
         setContentView(R.layout.activity_register);
         sharedPreferences = getSharedPreferences(LoginActivity.pref, Context.MODE_PRIVATE);
         final Intent homeActivity = new Intent( getApplicationContext(), HomeActivity.class);
-        if (sharedPreferences.contains("id"))
+        if (sharedPreferences.contains("id")) {
+            homeActivity.putExtra("login", "true");
             startActivity(homeActivity);
+        }
         email = findViewById(R.id.email);
         password = findViewById(R.id.password);
         name = findViewById(R.id.name);
@@ -282,5 +284,18 @@ public class RegisterActivity extends AppCompatActivity {
         if (mToggle.onOptionsItemSelected(item))
             return true;
         return super.onOptionsItemSelected(item);
+    }
+
+    public void offerLstJob(MenuItem item)
+    {
+        Intent homeActivity = new Intent( getApplicationContext(), HomeActivity.class);
+        homeActivity.putExtra("type", "Job");
+        startActivity(homeActivity);
+    }
+    public void offerLstInternship(MenuItem item)
+    {
+        Intent homeActivity = new Intent( getApplicationContext(), HomeActivity.class);
+        homeActivity.putExtra("type", "Internship");
+        startActivity(homeActivity);
     }
 }

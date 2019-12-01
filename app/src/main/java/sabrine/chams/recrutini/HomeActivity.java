@@ -8,7 +8,9 @@ import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -49,6 +51,8 @@ public class HomeActivity extends AppCompatActivity {
     String[] offerImgsUrls;
     String[] offerIDs;
     String   company_id = "null";
+    String   type = "null";
+    ListViewAdapter listViewAdapter;
     SharedPreferences sharedPreferences;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,8 +62,13 @@ public class HomeActivity extends AppCompatActivity {
         sharedPreferences = getSharedPreferences(LoginActivity.pref, Context.MODE_PRIVATE);
         if (sharedPreferences.contains("id")) {
             company_id = sharedPreferences.getString("id", null);
-            Snackbar.make(homePage,"You are loged in",Snackbar.LENGTH_LONG).show();
         }
+        Intent prevIntent = getIntent();
+        type = prevIntent.getStringExtra("type");
+        if(type == null)
+            type = "null";
+        if (prevIntent.getStringExtra("login") != null)
+            Snackbar.make(homePage,"You are loged in",Snackbar.LENGTH_LONG).show();
         lst = findViewById(R.id.listview);
         mToggle = new ActionBarDrawerToggle(this, homePage, R.string.open, R.string.close);
         homePage.addDrawerListener(mToggle);
@@ -96,11 +105,12 @@ public class HomeActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         final Activity thisActivity = this;
 
-        RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
+        final RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
         StringRequest jsonRequest = new StringRequest(Request.Method.POST, "https://sabrine-chams.alwaysdata.net/get_offre.php",
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
+                        Log.d("reponse complete",response);
                         JSONArray res = null;
                         try {
                             res = new JSONArray(response);
@@ -117,17 +127,17 @@ public class HomeActivity extends AppCompatActivity {
                                     offerImgsUrls[i] = res.getJSONObject(i).optString("img_url");
                                     offerIDs[i] = res.getJSONObject(i).optString("id");
                                 }
-                                ListViewAdapter listViewAdapter = new ListViewAdapter(thisActivity,offerNames,offerDescriptions,offerImgsUrls,offerIDs);
+                                listViewAdapter = new ListViewAdapter(thisActivity,offerNames,offerDescriptions,offerImgsUrls,offerIDs);
                                 lst.setAdapter(listViewAdapter);
                             }
                             else
                             {
                                 RelativeLayout.LayoutParams lparams = new RelativeLayout.LayoutParams(
-                                        RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+                                        RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT);
                                 TextView tv=new TextView(homePage.getContext());
                                 tv.setLayoutParams(lparams);
                                 tv.setText("No offers");
-                                homePage.addView(tv);
+                                lst.setEmptyView(tv);
                             }
                         } catch (JSONException e) {
                             Snackbar.make(homePage, "JSON parsing filed !", 15000).show();
@@ -150,11 +160,10 @@ public class HomeActivity extends AppCompatActivity {
             @Override
             protected Map<String, String> getParams() {
                 Map<String, String> params = new HashMap<String, String>();
-                Log.d("id_societe !!",company_id);
-                if (company_id != null)
-                    params.put("id", company_id);
-                else
-                    params.put("id", "null");
+                if (type != "null")
+                    params.put("type", type);
+                Log.d("idddd", company_id);
+                params.put("id", company_id);
                 return params;
             }};
         queue.add(jsonRequest);
@@ -165,6 +174,58 @@ public class HomeActivity extends AppCompatActivity {
                 Intent offerActivity = new Intent( getApplicationContext(), Offre.class);
                 offerActivity.putExtra("id", offer_id.getText().toString());
                 startActivity(offerActivity);
+            }
+        });
+        lst.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, final View view, final int position, long id) {
+                if (sharedPreferences.contains("id")) {
+                    new AlertDialog.Builder(HomeActivity.this)
+                            .setTitle("Delete Offer")
+                            .setMessage("Do you really want to delete this offer ?")
+                            .setIcon(android.R.drawable.ic_dialog_alert)
+                            .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+
+                                public void onClick(DialogInterface dialog, int whichButton) {
+                                    final TextView offer_id = view.findViewById(R.id.offer_id);
+                                    StringRequest jsonRequest = new StringRequest(Request.Method.POST, "https://sabrine-chams.alwaysdata.net/delete_offre_by_id.php",
+                                            new Response.Listener<String>() {
+                                                @Override
+                                                public void onResponse(String response) {
+                                                    JSONObject res = null;
+                                                    try {
+                                                        res = new JSONObject(response);
+                                                        if (res.getString("success").equals("1")) {
+                                                            Snackbar.make(homePage, "Offer deleted successfully !", 5000).show();
+                                                            listViewAdapter.remove(Integer.toString(position));
+                                                            listViewAdapter.notifyDataSetChanged();
+                                                        }
+                                                        else
+                                                            Snackbar.make(homePage, "Error when deleting the Offer", 5000).show();
+
+                                                    } catch (JSONException e) {
+                                                        Snackbar.make(homePage, "JSON parsing filed !", 15000).show();
+                                                        e.printStackTrace();
+                                                    }
+                                                }
+                                            },
+                                            new Response.ErrorListener() {
+                                                @Override
+                                                public void onErrorResponse(VolleyError error) {
+                                                    Snackbar.make(homePage, error.getMessage(), 15000).show();
+                                                }
+                                            }){
+                                        @Override
+                                        protected Map<String, String> getParams() {
+                                            Map<String, String> params = new HashMap<String, String>();
+                                            params.put("id", offer_id.getText().toString());
+                                            return params;
+                                        }};
+                                    queue.add(jsonRequest);
+                                }})
+                            .setNegativeButton(android.R.string.no, null).show();
+                }
+                return true;
             }
         });
     }
@@ -195,6 +256,19 @@ public class HomeActivity extends AppCompatActivity {
     {
         Intent addOffer = new Intent( getApplicationContext(), AjoutOffre.class);
         startActivity(addOffer);
+    }
+
+    public void offerLstJob(MenuItem item)
+    {
+        Intent homeActivity = new Intent( getApplicationContext(), HomeActivity.class);
+        homeActivity.putExtra("type", "Job");
+        startActivity(homeActivity);
+    }
+    public void offerLstInternship(MenuItem item)
+    {
+        Intent homeActivity = new Intent( getApplicationContext(), HomeActivity.class);
+        homeActivity.putExtra("type", "Internship");
+        startActivity(homeActivity);
     }
 
     @Override
